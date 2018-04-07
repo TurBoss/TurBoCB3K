@@ -1,0 +1,12 @@
+cx_Freeze
+data
+decorator
+funcsigs
+future
+Jinja2
+latex
+MarkupSafe
+ordered-set
+shutilwhich
+six
+tempdir
