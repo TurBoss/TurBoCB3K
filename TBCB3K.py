@@ -6,6 +6,8 @@ import traceback
 
 import logging
 
+from pprint import pprint
+
 from tkinter import Tk, Frame, Button, Label, PhotoImage, Text, END
 from tkinter.filedialog import askdirectory
 from tkinter.filedialog import askopenfilename
@@ -133,14 +135,18 @@ class TurBoCB3K:
 
         models = sorted(self.models[self.root_name].items())
 
+        pprint(models)
+
         env = make_env(loader=FileSystemLoader(os.path.dirname(self.tex_path)))
         self.tpl = env.get_template(os.path.basename(self.tex_path))
 
-        self.pdf = build_pdf(
-            self.tpl.render(logo=logo,
-                            bg_image=bg_image,
-                            models=models)
-        )
+        print(self.tpl)
+
+        render = self.tpl.render(logo=logo, bg_image=bg_image, models=models)
+
+        print(render)
+
+        self.pdf = build_pdf(render)
 
         self.pdf.save_to(path)
 
@@ -254,7 +260,7 @@ class Application(Frame):
         if thing == "tex":
             path = askopenfilename(filetypes=(("latex files", "*.tex"), ("all files", "*.*")))
             if path != "":
-                self.guest.tex_path = path
+                self.guest.tex_path = path.replace("\\", "/")
                 self.tex_path_label["text"] = path
             else:
                 self.guest.tex_path = None
@@ -263,7 +269,7 @@ class Application(Frame):
         if thing == "title":
             path = askopenfilename(filetypes=(("png images", "*.png"), ("all files", "*.*")))
             if path != "":
-                self.guest.title_path = path
+                self.guest.title_path = path.replace("\\", "/")
                 self.title_path_label["text"] = path
             else:
                 self.guest.title_path = None
@@ -272,7 +278,7 @@ class Application(Frame):
         if thing == "bg":
             path = askopenfilename(filetypes=(("png files", "*.png"), ("all files", "*.*")))
             if path != "":
-                self.guest.bg_path = path
+                self.guest.bg_path = path.replace("\\", "/")
                 self.bg_path_label["text"] = path
             else:
                 self.guest.bg_path = None
@@ -281,7 +287,7 @@ class Application(Frame):
         elif thing == "dir":
             path = askdirectory()
             if path != tuple():
-                self.guest.dir_path = path
+                self.guest.dir_path = path.replace("\\", "/")
                 self.dir_path_label["text"] = path
             else:
                 self.guest.dir_path = None
@@ -294,15 +300,15 @@ class Application(Frame):
             self.run_button["state"] = "disabled"
 
     def gen_pdf(self):
-        path = asksaveasfilename(defaultextension=".pdf", filetypes=(("PDF files", "*.pdf"),("All Files", "*.*")))
-        self.guest.create_pdf(path)
+        path = asksaveasfilename(defaultextension=".pdf", filetypes=(("PDF files", "*.pdf"), ("All Files", "*.*")))
+        self.guest.create_pdf(path.replace("\\", "/"))
 
     @staticmethod
     def excepthook(exc_type, exc_value, exc_traceback):
         message = traceback.format_exception(exc_type, exc_value, exc_traceback)
         msg = "".join(message)
         log.error(msg)
-        showerror(title="Troll error", message="Total Troll ERROR:\n NO VAS!")
+        showerror(title="error", message="ERROR")
 
 
 def main():
